@@ -1,11 +1,12 @@
 import React from "react";
-import { Button, Layout, Menu, Icon} from 'antd';
+import { Button, Layout, Menu, Icon } from 'antd';
 import { Route, Redirect } from 'react-router';
 import { Link } from 'react-router-dom';
 
 import styled from 'styled-components';
 import ProjectListPage from "../../pages/ProjectListPage";
 import IntroductionPage from "../../pages/IntroductionPage";
+import NewProjectPage from "../../pages/NewProjectPage";
 
 const Logo = styled.div`
   width: 220px;
@@ -45,6 +46,7 @@ class MainLayout extends React.Component {
   render() {
     return (
         <BigLayout>
+
           <Layout>
             <Header className="header">
               <Logo className="logo">
@@ -53,9 +55,6 @@ class MainLayout extends React.Component {
 
               <div style={{float: 'right'}}>
                 <InfoSpan style={{color: 'white'}}>{userInfo.name}</InfoSpan>
-                <InfoSpan>
-                  <Icon style={{color:' white'}} type="setting" />
-                </InfoSpan>
                 <Link to="/login"><Button type="primary">登出</Button></Link>
               </div>
             </Header>
@@ -79,12 +78,13 @@ class MainLayout extends React.Component {
                 </Menu>
               </Sider>
 
-              <Layout style={{padding: '0 24px 24px'}}>
+              <Layout style={{padding: '0 24px 24px 24px'}}>
 
-                <Content style={{background: '#fff', margin: 0}}>
+                <Content style={{background: '#fff', margin: 0, overflow:'auto'}}>
                   <Route path="/main/introduction" component={IntroductionPage}/>
                   <Redirect from="/main" to="/main/introduction"/>
                   <Route path="/main/projects" component={ProjectListPage}/>
+                  <Route path="/main/new" component={NewProjectPage}/>
                 </Content>
               </Layout>
 

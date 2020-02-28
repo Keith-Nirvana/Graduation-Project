@@ -1,5 +1,5 @@
 import React from "react";
-import {PageHeader, Divider, Typography, Table, BackTop} from 'antd';
+import {PageHeader, Divider, Typography, Table} from 'antd';
 
 import {rules} from '../../assets/RulesText';
 
@@ -29,7 +29,6 @@ class IntroductionPage extends React.Component {
   render() {
     return (
         <div style={{backgroundColor: 'white', width: '100%', padding: '20px 20px 20px 20px'}}>
-
 
           <Title level={1}>
             <PageHeader title="基于Lehman法则的区块链演化分析系统"
@@ -82,8 +81,6 @@ class IntroductionPage extends React.Component {
                 </p>
               </li>
             </ul>
-
-
           </div>
 
 

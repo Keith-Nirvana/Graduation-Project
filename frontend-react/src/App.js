@@ -4,8 +4,6 @@ import { Route } from 'react-router';
 
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
-import ProjectListPage from './pages/ProjectListPage';
-import IntroductionPage from './pages/IntroductionPage';
 
 import MainLayout from './components/MainLayout';
 
