@@ -1,0 +1,33 @@
+.wrapper {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(53,53,53,0.32);
+}
+
+.body {
+    width: 550px;
+    box-shadow: 1px 1px 10px 0 rgba(0, 0, 0, .3);
+    background-color: white;
+}
+
+.header {
+    color: #fff;
+    font-size: 24px;
+    padding: 30px 20px;
+    text-align: center;
+    background-color: #108ee9;
+}
+
+.form {
+    width: 80%;
+    margin: auto;
+    padding: 24px;
+
+}
+
+.btn {
+    width: 100%;
+}
+
