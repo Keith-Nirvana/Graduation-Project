@@ -23,6 +23,11 @@ class NewProjectPage extends React.Component {
         console.log('Received values of form: ', values);
       }
     });
+
+    this.props.history.push("/main/success");
+
+    if (1 === 2)
+      this.handleUpload();
   };
 
   normFile = e => {
@@ -53,8 +58,8 @@ class NewProjectPage extends React.Component {
   render() {
     const {getFieldDecorator} = this.props.form;
     const formItemLayout = {
-      labelCol: {span: 6},
-      wrapperCol: {span: 12},
+      labelCol: {span: 3},
+      wrapperCol: {span: 9},
     };
 
     const { uploading, fileList } = this.state;
@@ -80,7 +85,7 @@ class NewProjectPage extends React.Component {
 
     return (
         <WrapperDiv>
-          <PageHeader title="创建一个新项目" style={{marginBottom: 30, marginLeft: 200}}/>
+          <PageHeader title="创建一个新项目" style={{marginBottom: 30}}/>
 
           <div >
             <Form {...formItemLayout} onSubmit={this.handleSubmit} >
@@ -102,7 +107,7 @@ class NewProjectPage extends React.Component {
               </Form.Item>
 
               <Form.Item label="版本数">
-                {getFieldDecorator('input-number', {
+                {getFieldDecorator('inputNumber', {
                   initialValue: 1,
                   rules: [{required: true, message: '请输入需要分析的版本总数!'}]
                 })(<InputNumber min={1} max={20}/>)}

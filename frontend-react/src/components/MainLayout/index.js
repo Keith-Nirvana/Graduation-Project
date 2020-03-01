@@ -2,11 +2,14 @@ import React from "react";
 import { Button, Layout, Menu, Icon } from 'antd';
 import { Route, Redirect } from 'react-router';
 import { Link } from 'react-router-dom';
-
 import styled from 'styled-components';
+
 import ProjectListPage from "../../pages/ProjectListPage";
 import IntroductionPage from "../../pages/IntroductionPage";
 import NewProjectPage from "../../pages/NewProjectPage";
+import RulesSettingsPage from '../../pages/RulesSettingsPage';
+import CreationSuccessPage from '../../pages/CreationSuccessPage';
+import ViewChartsPage from '../../pages/ViewChartsPage';
 
 const Logo = styled.div`
   width: 220px;
@@ -83,8 +86,13 @@ class MainLayout extends React.Component {
                 <Content style={{background: '#fff', margin: 0, overflow:'auto'}}>
                   <Route path="/main/introduction" component={IntroductionPage}/>
                   <Redirect from="/main" to="/main/introduction"/>
+
                   <Route path="/main/projects" component={ProjectListPage}/>
+                  <Route path="/main/rules" component={RulesSettingsPage}/>
+                  <Route path="/main/charts" component={ViewChartsPage}/>
+
                   <Route path="/main/new" component={NewProjectPage}/>
+                  <Route path="/main/success" component={CreationSuccessPage}/>
                 </Content>
               </Layout>
 

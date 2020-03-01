@@ -39,10 +39,10 @@ class IntroductionPage extends React.Component {
             <Divider orientation="left">
               <Title level={4}>系统背景介绍</Title>
             </Divider>
-            <p style={{lineHeight: '35px', fontSize: '18px'}}>
+            <p style={{lineHeight: '25px', fontSize: '15px'}}>
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
               Lehman对软件演化的发展规律进行了观察与总结，构成了Lehman法则。他在1978年首次发表了他的研究成果。
-              在此之后，他不断基于新的研究数据对该法则进行扩充修订，包括考虑软件的不确定性和对“反馈，演化和软件技术”（FEAST）系统的研究，并在1996年对该法则进行了最终定稿。
+              在此之后，他不断基于新的研究数据对该法则进行扩充修订，包括考虑软件的不确定性带来的影响和后续对“反馈，演化和软件技术”（FEAST）类型系统的研究，并在1996年对该法则进行了最终定稿。
               Lehman法则称为后来研究软件演化时主要的验证性规律，它包含以下8条内容:
             </p>
 
@@ -56,27 +56,27 @@ class IntroductionPage extends React.Component {
 
             <ul>
               <li>
-                <p style={{lineHeight: '35px', fontSize: '18px'}}>
+                <p style={{lineHeight: '25px', fontSize: '15px'}}>
                   在项目管理中查看您所有的演化分析项目清单
                 </p>
               </li>
               <li>
-                <p style={{lineHeight: '35px', fontSize: '18px'}}>
+                <p style={{lineHeight: '25px', fontSize: '15px'}}>
                   通过点击项目管理右上方的新建按钮实现新建项目
                 </p>
               </li>
               <li>
-                <p style={{lineHeight: '35px', fontSize: '18px'}}>
+                <p style={{lineHeight: '25px', fontSize: '15px'}}>
                   通过点击项目管理右上方的设置按钮进行演化分析所需法则的配置
                 </p>
               </li>
               <li>
-                <p style={{lineHeight: '35px', fontSize: '18px'}}>
+                <p style={{lineHeight: '25px', fontSize: '15px'}}>
                   点击项目列表中的一条项目来查看它的分析结果
                 </p>
               </li>
               <li>
-                <p style={{lineHeight: '35px', fontSize: '18px'}}>
+                <p style={{lineHeight: '25px', fontSize: '15px'}}>
                   点击项目列表中的一条项目右下角的下载按钮来获取Excel数据
                 </p>
               </li>
