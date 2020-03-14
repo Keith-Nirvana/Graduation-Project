@@ -1,8 +1,12 @@
 import React from "react";
 import styled from 'styled-components';
 import {PageHeader, Button, Icon, List, Empty} from 'antd';
+import axios from 'axios';
+
+import {message} from "antd/lib/index";
 
 import ProjectCard from '../../components/ProjectCard';
+import userInfo from "../../stores/global";
 
 const WrapperDiv = styled.div`
   backgroundColor: white;
@@ -67,9 +71,39 @@ const mockInfo = [
 ];
 
 class ProjectListPage extends React.Component {
-  componentDidMount(){
-    // console.log(this.props);
+  constructor(props){
+    super(props);
+    this.state = {
+      projectList: []
+    }
+
   }
+
+
+  componentDidMount(){
+    let _this = this;
+    axios.get('/project/list', {
+      params: {
+        username: userInfo.username
+      }
+    })
+        .then(function (response) {
+          let data = response.data;
+          _this.setState({
+            projectList: data.projects
+          })
+          // console.log(response.data)
+        })
+        .catch(function (error) {
+          message.warning('网络链接出错');
+        });
+  }
+
+  componentWillUnmount() {
+    this.setState = (state,callback)=>{
+      return;
+    };
+  };
 
 
   render() {
@@ -80,9 +114,9 @@ class ProjectListPage extends React.Component {
                            </span>
                          }/>;
 
-    if (mockInfo.length !== 0)
+    if (this.state.projectList.length !== 0)
       content = <List grid={{gutter: 16, column: 4}}
-                      dataSource={mockInfo}
+                      dataSource={this.state.projectList}
                       renderItem={item => (
                           <List.Item>
                             <ProjectCard projectName={item.projectName} projectDescription={item.projectDescription}

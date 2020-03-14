@@ -9,7 +9,7 @@ const SwitchWrapper = styled.div`
 class RulesSwitch extends React.Component{
 
   handleChange = (checked) => {
-    this.props.outer(checked, this.props.ruleText);
+    this.props.outer(checked, this.props.ruleKey);
   };
 
   render() {

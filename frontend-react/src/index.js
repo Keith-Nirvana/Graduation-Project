@@ -7,10 +7,14 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
+import axios from 'axios';
 
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
+
+
+axios.defaults.baseURL = 'http://127.0.0.1:5000';
 
 ReactDOM.render(
     <App/>,

@@ -10,6 +10,7 @@ import NewProjectPage from "../../pages/NewProjectPage";
 import RulesSettingsPage from '../../pages/RulesSettingsPage';
 import CreationSuccessPage from '../../pages/CreationSuccessPage';
 import ViewChartsPage from '../../pages/ViewChartsPage';
+import userInfo from "../../stores/global";
 
 const Logo = styled.div`
   width: 220px;
@@ -37,10 +38,6 @@ const InfoSpan = styled.span`
   margin-right: 20px
 `;
 
-const userInfo = {
-  name: "Jiawei Cao"
-};
-
 
 const {Header, Content, Sider} = Layout;
 
@@ -57,7 +54,7 @@ class MainLayout extends React.Component {
               </Logo>
 
               <div style={{float: 'right'}}>
-                <InfoSpan style={{color: 'white'}}>{userInfo.name}</InfoSpan>
+                <InfoSpan style={{color: 'white'}}>{userInfo.username}</InfoSpan>
                 <Link to="/login"><Button type="primary">登出</Button></Link>
               </div>
             </Header>

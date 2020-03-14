@@ -1,16 +1,40 @@
 import React from "react";
-import {Row, Col, Form, Icon, Input, Button} from 'antd';
+import {Row, Col, Form, Icon, Input, Button, message} from 'antd';
 import 'antd/dist/antd.css';
 import {Link} from 'react-router-dom';
 import style from './style.module.css';
+import axios from 'axios';
+
+import userInfo from '../../stores/global';
 
 class LoginPage extends React.Component {
-  handleSubmit = e => {
+  constructor(props){
+    super(props);
+    this.handleSubmit = this.handleSubmit.bind(this)
+  }
+
+
+  handleSubmit(e) {
     e.preventDefault();
+
+    let _this = this;
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        console.log('Received values of form: ', values);
-        this.props.history.push("/main");
+        console.log('Received values of login form: ', values);
+
+        axios.get('/user/login', {
+          params: {
+            username: values.username,
+            password: values.password
+          }
+        })
+            .then(function (response) {
+              userInfo.username = values.username;
+              _this.props.history.push("/main");
+            })
+            .catch(function (error) {
+                message.warning('用户名不存在或密码错误');
+            });
       }
     });
   };
@@ -20,7 +44,7 @@ class LoginPage extends React.Component {
 
     return (
         <div className={style.wrapper}>
-          <div className={style.body}>
+          <div className={style.body} id="loginDiv">
 
             <header className={style.header}>
               <span>基于Lehman法则的区块链软件演化分析系统</span>
@@ -30,7 +54,7 @@ class LoginPage extends React.Component {
             <section className={style.form}>
               <Form onSubmit={this.handleSubmit}>
                 <Form.Item>
-                  {getFieldDecorator('用户名', {
+                  {getFieldDecorator('username', {
                     rules: [{required: true, message: 'Please input your username!'}],
                   })(
                       <Input

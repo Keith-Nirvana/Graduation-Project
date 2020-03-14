@@ -1,6 +1,8 @@
 import React from "react";
 import {Form, Input, Button} from 'antd';
 import styled from 'styled-components';
+import {message} from "antd/lib/index";
+import axios from 'axios';
 
 const layout = {
   labelCol: {span: 5},
@@ -33,11 +35,30 @@ const HeaderDiv = styled.div`
 `;
 
 class RegisterPage extends React.Component {
-  handleSubmit = e => {
+  constructor(props){
+    super(props);
+    this.handleSubmit = this.handleSubmit.bind(this)
+  }
+
+  handleSubmit(e) {
     e.preventDefault();
+
+    let _this = this;
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        console.log('Received values of form: ', values);
+        console.log('Received values of register form: ', values);
+
+        axios.post('/user/login', {
+          username: values.username,
+          password: values.password
+        })
+            .then(function (response) {
+              message.warning('注册成功，请登录');
+              _this.props.history.push("/login");
+            })
+            .catch(function (error) {
+              message.warning('用户名已存在');
+            });
       }
     });
   };
