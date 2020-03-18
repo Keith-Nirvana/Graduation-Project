@@ -89,6 +89,7 @@ class ProjectListPage extends React.Component {
     })
         .then(function (response) {
           let data = response.data;
+          console.log(data);
           _this.setState({
             projectList: data.projects
           })
@@ -120,7 +121,7 @@ class ProjectListPage extends React.Component {
                       renderItem={item => (
                           <List.Item>
                             <ProjectCard projectName={item.projectName} projectDescription={item.projectDescription}
-                                         history={this.props.history} isFinished={item.isFinished}/>
+                                         history={this.props.history} isFinished={item.status}/>
                           </List.Item>
                       )}/>;
 

@@ -5,6 +5,7 @@ from multiprocessing.pool import ThreadPool
 import os
 
 from factory.servicefactory import project_service
+from service.analyzer import RulesAnalyzer
 
 ns = Namespace("project", description = "关于项目管理")
 
@@ -31,6 +32,8 @@ pl_arg_parser.add_argument('username', type = str, help = '用户名', location 
 不要用ns.param, 那个参数会解析放在url的/里面，不是query里面
 要在namespace中声明
 '''
+
+
 @ns.route("/list")
 class ProjectList(Resource):
 
@@ -60,6 +63,7 @@ class ProjectCreation(Resource):
 		res = project_service.create_new_project_for_user(username, project_info)
 		return res
 
+
 '''
 Another solution for file upload
 reference: https://flask-restplus.readthedocs.io/en/stable/parsing.html
@@ -76,9 +80,10 @@ upload_parser.add_argument('file', location='files',
 BASE_DIR_PATH = ".\\assets"
 
 upload_response = ns.model("上传响应信息", {
-    'result': fields.Boolean(description="是否上传成功"),
-	'message': fields.String(description="提示信息", default="")
+	'result': fields.Boolean(description = "是否上传成功"),
+	'message': fields.String(description = "提示信息", default = "")
 })
+
 
 @ns.route("/upload")
 class UploadFiles(Resource):
@@ -93,26 +98,27 @@ class UploadFiles(Resource):
 		if uploaded_file:
 			filename = secure_filename(uploaded_file.filename)
 			concat_file_name = project_id + "-" + username + "-" + filename
+			concat_path_name = os.path.join(BASE_DIR_PATH, concat_file_name)
 
-			uploaded_file.save(os.path.join(BASE_DIR_PATH, concat_file_name))
+			uploaded_file.save(concat_path_name)
 
-			# file extracted
-			extracted_file_path = project_service.extracted_upload_files(BASE_DIR_PATH, concat_file_name)
-			if extracted_file_path == "":
+			# 调用解压文件的方法
+			extracted_file_path_name = project_service.extracted_upload_files(BASE_DIR_PATH, concat_file_name)
+			# print(extracted_file_path_name, " and ", type(extracted_file_path_name))
+
+			# 解压失败
+			if extracted_file_path_name == "":
 				return {"result": "failed",
-		                "message": "file extracted failed"}, 200
-
+				        "message": "file extracted failed"}, 200
+			# 解压成功，将项目同解压后的文件关联
 			else:
-				# associate with project when succeeding in file extraction
-				project_service.associated_upload_files_with_project(project_id, extracted_file_path)
-				print("right process")
+				project_service.associated_upload_files_with_project(project_id, extracted_file_path_name)
 
 				# start the analyze process
 				pool = ThreadPool(processes = 1)
-				pool.apply_async()
+				pool.apply_async(RulesAnalyzer().start_evolutionary_analysis(extracted_file_path_name))
 
 				return {"result": "success"}, 200
 
 		return {"result": "failed",
 		        "message": "file upload failed"}, 200
-
