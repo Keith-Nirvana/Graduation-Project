@@ -1,14 +1,19 @@
 import os
 import hashlib
 import lizard
+import collections
+import util.filewriter as fw
+
+from util.commentcounter import CommentCounter
 # from factory.daofactory import project_dao
 # from factory.daofactory import rule_dao
 
 EXT_LIMITATION = [".py", ".cpp", ".c", ".h"]
+EXT_LIMITATION_COMPLEX = [".cpp", ".c", ".h"]
 
 class RulesAnalyzer(object):
 	def __init__(self):
-		self.metric_dict = {}
+		self.metric_dict = collections.OrderedDict()
 		self.version_count = -1
 		self.current_root_dir = ""
 
@@ -21,7 +26,7 @@ class RulesAnalyzer(object):
 			return
 
 		self.current_root_dir = project_base_path
-		self.version_count = self.get_version_count()
+		self.initialize_version_count()
 		self.initialize_metric_dict()
 
 		# 分解文件夹名
@@ -41,33 +46,25 @@ class RulesAnalyzer(object):
 				path_a = os.path.join(project_base_path, str(i+1))
 				path_b = os.path.join(project_base_path, str(i+2))
 				diff_result = self.dir_compare(path_a, path_b)
-				self.metric_dict[str(i+1)] = diff_result
+				self.metric_dict[str(i+1)].update(diff_result)
 
 		for i in range(self.version_count):
 			root_path = os.path.join(project_base_path, str(i + 1))
 			analysis_result = self.complex_analyze(root_path)
-			self.metric_dict[str(i + 1)] = analysis_result
+			self.metric_dict[str(i + 1)].update(analysis_result)
 
-		# dir_or_files = os.listdir(project_base_path)
-		# for dir_file in dir_or_files:
-		# 	# 获取目录或者文件的路径
-		# 	dir_file_path = os.path.join(project_base_path, dir_file)
-		# 	print(dir_file_path)
-		print("projectId:  " + project_Id + ", username: " + username)
+		if rule_settings.get("fileChangeRate"):
+			self.metric_append_rate_info("fileChangeRate", "fileNumber")
 
+		if rule_settings.get("functionChangeRate"):
+			self.metric_append_rate_info("functionChangeRate", "functionNumber")
+
+		fw.write_analyze_result(self.metric_dict, os.path.split(project_base_path)[1])
 		# todo
 		# project_dao.update_project_status(project_Id, username)
 
-	def complex_analyze(self, root_path):
-		res = {"mcc": 0.0, "fileNumber": 0, "functionNumber": 0, "loc": 0}
-
-
-
-
-		return res
-
-	def get_version_count(self):
-		return os.listdir(self.current_root_dir).__len__()
+	def initialize_version_count(self):
+		self.version_count = os.listdir(self.current_root_dir).__len__()
 
 	def initialize_metric_dict(self):
 		for i in range(self.version_count):
@@ -77,7 +74,7 @@ class RulesAnalyzer(object):
 		# todo
 		# rule_dao.get_rules_settings_by_user(username) # pack成一个list
 		return {
-			"fileChanges": False,
+			"fileChanges": True,
 			"mcc": True,
 			"fileNumber": True,
 			"functionNumber": True,
@@ -94,8 +91,41 @@ class RulesAnalyzer(object):
 				return False
 		return True
 
+	def complex_analyze(self, root_path):
+		res = {"mcc": 0.0, "fileNumber": 0, "functionNumber": 0, "loc": 0, "commentRate": 0.0, "tarskiModel": 0}
+		comment_lines = 0
+		mcc = 0.0
+
+		for root, dirs, files in os.walk(root_path):
+			for file in files:
+				ext = os.path.splitext(file)[1]
+				file_full_path = os.path.join(root, file)
+
+				# 迭代所有符合扩展名要求的文件
+				if ext in EXT_LIMITATION_COMPLEX:
+					lizard_result = lizard.analyze_file(file_full_path)
+
+					res["fileNumber"] += 1
+					mcc += lizard_result.CCN
+					res["functionNumber"] += lizard_result.function_list.__len__()
+					res["loc"] += lizard_result.nloc
+
+					if ext == ".py":
+						loc, cloc = CommentCounter.get_comment_analysis_for_python_file(file_full_path)
+						comment_lines += cloc
+
+					else:
+						loc, cloc = CommentCounter.get_comment_analysis_for_C_file(file_full_path)
+						comment_lines += cloc
+
+		res["mcc"] = mcc / res["functionNumber"]
+		res["commentRate"] = comment_lines / res["loc"]
+		res["tarskiModel"] = res["loc"]
+
+		return res
+
 	def dir_compare(self, path_a, path_b):
-		res = {"fileChanges": {"added": 0, "deleted": 0, "modified": 0}}
+		res = {"fileChanges": {"fileAdded": 0, "fileDeleted": 0, "fileModified": 0}}
 
 		path_a, a_files = self.get_all_files(path_a)
 		path_b, b_files = self.get_all_files(path_b)
@@ -109,15 +139,15 @@ class RulesAnalyzer(object):
 			md5_file_in_a = self.get_file_md5(path_a + '\\' + f)
 			md5_file_in_b = self.get_file_md5(path_b + '\\' + f)
 			if md5_file_in_a != md5_file_in_b:
-				res["fileChanges"]["modified"] += 1
+				res["fileChanges"]["fileModified"] += 1
 
 		# 处理仅出现在一个目录中的文件
 		separate_files = set_a ^ set_b
 		for sf in separate_files:
 			if sf in a_files:
-				res["fileChanges"]["deleted"] += 1
+				res["fileChanges"]["fileAdded"] += 1
 			elif sf in b_files:
-				res["fileChanges"]["added"] += 1
+				res["fileChanges"]["fileDeleted"] += 1
 
 		return res
 
@@ -155,9 +185,14 @@ class RulesAnalyzer(object):
 					file_relative_path = file_full_path[len(true_root_path):]
 					file_list.append(file_relative_path)
 
-		# print(true_root_path, file_list.__len__())
 		return true_root_path, file_list
 
+	def metric_append_rate_info(self, new_keyword: str, base_keyword: str):
+		for i in range(len(self.metric_dict) - 1):
+			prev = self.metric_dict[str(i + 1)]
+			latter = self.metric_dict[str(i + 2)]
+
+			prev[new_keyword] = (latter[base_keyword] - prev[base_keyword]) / prev[base_keyword]
 
 # 主体分析逻辑测试
 if __name__ == '__main__':
@@ -178,7 +213,9 @@ if __name__ == '__main__':
 	# res = lizard.analyze_file(r".\1\bitcoin-0.1.5\main.cpp")
 	# print(type(res))
 	# print(res.__dict__)
-	# # print(my_list)
+	# print(len(res.function_list))
+	# print(res.CCN, " and ave CCN ", res.average_CCN)
+	# print(res.function_list[0].__dict__)
 	# print("finished")
 
 	# 4
@@ -186,3 +223,18 @@ if __name__ == '__main__':
 	# res = rules_analyzer.dir_compare(r"..\assets\4-cao-test_data\3", r"..\assets\4-cao-test_data\4")
 	# print(res)
 
+	# 5 '''
+	# my_line = r"char[] a = 1; /****fuck"
+	# regMatch = re.match('^([^/]*)/(/|\*)+(.*)$', my_line.strip())
+	# print(regMatch is None)
+	# print(regMatch.group(0))
+	# print(regMatch.group(1))
+	# print(regMatch.group(2))
+	# print(regMatch.group(3))
+
+	# 6
+	# ra = RulesAnalyzer()
+	# res = ra.complex_analyze(r"..\assets\4-cao-test_data\3")
+	# # res = ra.get_encoding(r"..\assets\4-cao-test_data\3\bitcoin-0.2.0\irc.cpp")
+	# # res = ra.get_encoding(r"..\assets\2-kiki-test_data\3\bitcoin-0.2.0\main.cpp")
+	# print(res)
