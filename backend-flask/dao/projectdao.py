@@ -34,6 +34,18 @@ class ProjectDao(object):
 			session.close()
 
 	@staticmethod
+	def get_exact_project_by_id(project_id):
+		try:
+			session = db.session
+			result = session.query(Project).filter(Project.id == project_id).first()
+			return result
+		except:
+			print("Get exact project error 2")
+			traceback.print_exc()
+		finally:
+			session.close()
+
+	@staticmethod
 	def insert_new_project_for_user(username: str, payload: dict):
 		checker = ProjectDao.get_exact_project_by_name_and_user(payload["projectName"], username)
 		if checker is not None:
@@ -69,7 +81,7 @@ class ProjectDao(object):
 
 			session.commit()
 		except:
-			print("Get exact project error 1")
+			print("Update project error")
 			traceback.print_exc()
 		finally:
 			session.close()
@@ -101,7 +113,7 @@ class ProjectDao(object):
 
 			session.commit()
 		except:
-			print("Get exact project error 1")
+			print("Delete project error")
 			traceback.print_exc()
 		finally:
 			session.close()

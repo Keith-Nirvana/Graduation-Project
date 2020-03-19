@@ -7,11 +7,12 @@ const { Meta } = Card;
 class ProjectCard extends React.Component{
 
   jumpToCharts(e){
-    console.log(e);
+
     this.props.history.push({
       pathname: "/main/charts",
       search: qs.stringify({
-        project: this.props.projectName
+        projectName: this.props.projectName,
+        projectId: this.props.projectId
       })
     });
   }

@@ -132,3 +132,37 @@ class UploadFiles(Resource):
 
 		return {"result": "failed",
 		        "message": "file upload failed"}, 200
+
+
+@ns.route("/download")
+class DownloadAnalysisFiles(Resource):
+
+	@ns.doc("下载分析文件")
+
+	def get(self):
+		pass
+
+
+pic_arg_parser = ns.parser()
+pic_arg_parser.add_argument('username', type = str, help = '用户名', location = 'args')
+pic_arg_parser.add_argument('projectId', type = int, help = '项目编号', location = 'args')
+pic_arg_parser.add_argument('projectName', type = str, help = '项目名称', location = 'args')
+
+@ns.route("/view")
+class ViewAnalysisPicture(Resource):
+
+	@ns.doc("查看分析结果")
+	@ns.expect(pic_arg_parser)
+	@ns.response(200, "获取图片路径成功")
+	def get(self):
+		args = pic_arg_parser.parse_args()
+		username = args['username']
+		project_id = args['projectId']
+
+		res = project_service.get_project_analyze_pictures(project_id, username)
+
+		new_res = []
+		for item in res:
+			new_res.append("../../../../backend-flask/" + item[1:])
+
+		return {"links": new_res}, 200

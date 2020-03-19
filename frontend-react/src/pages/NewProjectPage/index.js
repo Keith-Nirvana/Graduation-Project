@@ -109,18 +109,22 @@ class NewProjectPage extends React.Component {
         .then(function (response) {
           let data = response.data;
 
-          if(data.result === "failure"){
+          if(data.result === "failed"){
             message.warning('上传文件失败，项目新建失败');
+            message.warning(data.message);
+            setTimeout(function () {
+              _this.props.history.push("/main/projects");
+            }, 500);
           }
 
           else{
             setTimeout(function () {
-              message.success('成功提交项目，请等待后台分析完成');
+              message.success('成功提交项目');
               _this.setState({
                 uploading: false,
               });
               _this.props.history.push("/main/success");
-            }, 1000)
+            }, 500)
           }
         })
         .catch(function (error) {

@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
 import os
 
+from factory.servicefactory import project_service
+from factory.servicefactory import rule_service
 
 BASE_PATH = r"./model/image_result"
 # include download interface, draw picture interface
@@ -21,10 +23,9 @@ class PresentService(object):
 		self.project_Id = project_Id
 		self.username = username
 
-		# todo 去查projectName
-		self.project_name = "bitcoin1"
+		self.project_name = project_service.get_single_project(project_Id)
 
-		rule_settings = self.get_rule_settings("aaa")
+		rule_settings = rule_service.get_rule_settings_for_analyse(username)
 
 		os.mkdir(os.path.join(BASE_PATH, str(self.project_Id) + "-" + self.username))
 		for key, value in rule_settings.items():
@@ -123,20 +124,20 @@ class PresentService(object):
 		plt.savefig(os.path.join(BASE_PATH, folder_name, "fileChanges" + self.project_name + '.png'))
 		plt.show()
 
-	def get_rule_settings(self, username: str) ->dict:
-		# todo 迁移到ruleservice去
-		# rule_dao.get_rules_settings_by_user(username) # pack成一个list
-		return {
-			"fileChanges": True,
-			"mcc": True,
-			"fileNumber": False,
-			"functionNumber": True,
-			"fileChangeRate": True,
-			"functionChangeRate": True,
-			"loc": False,
-			"commentRate": True,
-			"tarskiModel": False,
-		}
+	# def get_rule_settings(self, username: str) ->dict:
+	#
+	# 	# rule_dao.get_rules_settings_by_user(username) # pack成一个list
+	# 	return {
+	# 		"fileChanges": True,
+	# 		"mcc": True,
+	# 		"fileNumber": False,
+	# 		"functionNumber": True,
+	# 		"fileChangeRate": True,
+	# 		"functionChangeRate": True,
+	# 		"loc": False,
+	# 		"commentRate": True,
+	# 		"tarskiModel": False,
+	# 	}
 
 
 if __name__ == '__main__':

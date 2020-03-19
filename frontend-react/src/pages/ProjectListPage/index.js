@@ -120,7 +120,7 @@ class ProjectListPage extends React.Component {
                       dataSource={this.state.projectList}
                       renderItem={item => (
                           <List.Item>
-                            <ProjectCard projectName={item.projectName} projectDescription={item.projectDescription}
+                            <ProjectCard projectName={item.projectName} projectDescription={item.projectDescription} projectId={item.id}
                                          history={this.props.history} isFinished={item.status}/>
                           </List.Item>
                       )}/>;
