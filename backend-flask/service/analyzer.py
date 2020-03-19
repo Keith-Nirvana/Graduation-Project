@@ -1,12 +1,12 @@
 import os
-import hashlib
 import lizard
 import collections
-import util.filewriter as fw
+import util.fileoperator as fo
 
 from util.commentcounter import CommentCounter
-# from factory.daofactory import project_dao
-# from factory.daofactory import rule_dao
+from service.presentservice import PresentService
+from factory.daofactory import project_dao
+from factory.servicefactory import rule_service
 
 EXT_LIMITATION = [".py", ".cpp", ".c", ".h"]
 EXT_LIMITATION_COMPLEX = [".cpp", ".c", ".h"]
@@ -33,14 +33,14 @@ class RulesAnalyzer(object):
 		folder_name = os.path.split(project_base_path)[1].split('-')
 		project_Id = folder_name[0]
 		username = folder_name[1]
-		rule_settings = self.get_rule_settings(username)
+		rule_settings = rule_service.get_rule_settings_for_analyse(username)
 
 		# 没有需要验证的指标
-		if self.is_no_rule_needed(rule_settings):
+		if rule_service.is_no_rule_needed_for_analyse(username):
 			print("No rules needs to be validated. Evolution analysis stop")
 			return
 
-		# file changes 计算
+		# =====================分析部分开始=====================
 		if rule_settings.get("fileChanges"):
 			for i in range(self.version_count - 1):
 				path_a = os.path.join(project_base_path, str(i+1))
@@ -59,9 +59,14 @@ class RulesAnalyzer(object):
 		if rule_settings.get("functionChangeRate"):
 			self.metric_append_rate_info("functionChangeRate", "functionNumber")
 
-		fw.write_analyze_result(self.metric_dict, os.path.split(project_base_path)[1])
-		# todo
-		# project_dao.update_project_status(project_Id, username)
+		# =====================输出csv, 制图=====================
+		self.remove_metric_dict_item(rule_settings)
+		analysis_file_path = fo.write_analyze_result(self.metric_dict, os.path.split(project_base_path)[1])
+		present_service = PresentService()
+		present_service.draw_plots_for_project(analysis_file_path, project_Id, username)
+
+		project_dao.update_project_status(project_Id, username)
+		print("=================finish the analyze process")
 
 	def initialize_version_count(self):
 		self.version_count = os.listdir(self.current_root_dir).__len__()
@@ -70,26 +75,25 @@ class RulesAnalyzer(object):
 		for i in range(self.version_count):
 			self.metric_dict[str(i+1)] = {}
 
-	def get_rule_settings(self, username: str) ->dict:
-		# todo
-		# rule_dao.get_rules_settings_by_user(username) # pack成一个list
-		return {
-			"fileChanges": True,
-			"mcc": True,
-			"fileNumber": True,
-			"functionNumber": True,
-			"fileChangeRate": True,
-			"functionChangeRate": True,
-			"loc": True,
-			"commentRate": True,
-			"tarskiModel": True,
-		}
+	# def get_rule_settings(self, username: str) ->dict:
+	# 	# rule_dao.get_rules_settings_by_user(username) # pack成一个list
+	# 	return {
+	# 		"fileChanges": True,
+	# 		"mcc": True,
+	# 		"fileNumber": False,
+	# 		"functionNumber": True,
+	# 		"fileChangeRate": True,
+	# 		"functionChangeRate": True,
+	# 		"loc": False,
+	# 		"commentRate": True,
+	# 		"tarskiModel": False,
+	# 	}
 
-	def is_no_rule_needed(self, rule_settings_to_test: dict) -> bool:
-		for key, values in rule_settings_to_test.items():
-			if values:
-				return False
-		return True
+	# def is_no_rule_needed(self, rule_settings_to_test: dict) -> bool:
+	# 	for key, values in rule_settings_to_test.items():
+	# 		if values:
+	# 			return False
+	# 	return True
 
 	def complex_analyze(self, root_path):
 		res = {"mcc": 0.0, "fileNumber": 0, "functionNumber": 0, "loc": 0, "commentRate": 0.0, "tarskiModel": 0}
@@ -127,8 +131,8 @@ class RulesAnalyzer(object):
 	def dir_compare(self, path_a, path_b):
 		res = {"fileChanges": {"fileAdded": 0, "fileDeleted": 0, "fileModified": 0}}
 
-		path_a, a_files = self.get_all_files(path_a)
-		path_b, b_files = self.get_all_files(path_b)
+		path_a, a_files = fo.get_all_files(path_a)
+		path_b, b_files = fo.get_all_files(path_b)
 
 		set_a = set(a_files)
 		set_b = set(b_files)
@@ -136,8 +140,8 @@ class RulesAnalyzer(object):
 		shared_files = set_a & set_b  # 处理共有文件
 
 		for f in sorted(shared_files):
-			md5_file_in_a = self.get_file_md5(path_a + '\\' + f)
-			md5_file_in_b = self.get_file_md5(path_b + '\\' + f)
+			md5_file_in_a = fo.get_file_md5(path_a + '\\' + f)
+			md5_file_in_b = fo.get_file_md5(path_b + '\\' + f)
 			if md5_file_in_a != md5_file_in_b:
 				res["fileChanges"]["fileModified"] += 1
 
@@ -145,47 +149,11 @@ class RulesAnalyzer(object):
 		separate_files = set_a ^ set_b
 		for sf in separate_files:
 			if sf in a_files:
-				res["fileChanges"]["fileAdded"] += 1
-			elif sf in b_files:
 				res["fileChanges"]["fileDeleted"] += 1
+			elif sf in b_files:
+				res["fileChanges"]["fileAdded"] += 1
 
 		return res
-
-	def get_file_md5(self, file_path):
-		if not os.path.exists(file_path):
-			print("No such file. Cannot calculate the md5 value")
-			return
-
-		hash_val = hashlib.md5()
-
-		with open(file_path, 'rb') as f:
-			while True:
-				bytes_block = f.read(8096)
-
-				if not bytes_block:
-					break
-
-				hash_val.update(bytes_block)
-
-		return hash_val.hexdigest()
-
-	def get_all_files(self, root_path):
-		file_list = []
-
-		# 用户以序号封装项目。需获取项目的真实根路径
-		true_root_path = root_path
-		while os.listdir(true_root_path).__len__() == 1 and os.path.isdir(os.path.join(true_root_path, os.listdir(true_root_path)[0])):
-			true_root_path = os.path.join(true_root_path, os.listdir(true_root_path)[0])
-
-		# 将需比较的文件加入列表（由文件后缀决定）
-		for root, dirs, files in os.walk(true_root_path):
-			for file in files:
-				if os.path.splitext(file)[1] in EXT_LIMITATION:
-					file_full_path = os.path.join(root, file)
-					file_relative_path = file_full_path[len(true_root_path):]
-					file_list.append(file_relative_path)
-
-		return true_root_path, file_list
 
 	def metric_append_rate_info(self, new_keyword: str, base_keyword: str):
 		for i in range(len(self.metric_dict) - 1):
@@ -194,11 +162,19 @@ class RulesAnalyzer(object):
 
 			prev[new_keyword] = (latter[base_keyword] - prev[base_keyword]) / prev[base_keyword]
 
+	def remove_metric_dict_item(self, rule_settings: dict):
+		for key, values in rule_settings.items():
+			if not values:
+				for version, version_metric in self.metric_dict.items():
+					metric_item = version_metric.get(key)
+					if metric_item is not None:
+						version_metric.pop(key)
+
+
 # 主体分析逻辑测试
 if __name__ == '__main__':
 	ra = RulesAnalyzer()
 	ra.start_evolutionary_analysis(r"..\assets\4-cao-test_data")
-	print(ra.metric_dict)
 
 	# 1
 	# RulesAnalyzer().get_all_files(r"..\assets\4-cao-test_data\4")

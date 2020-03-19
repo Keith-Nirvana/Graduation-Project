@@ -2,6 +2,7 @@ from flask_restplus import Resource, fields, Namespace
 from flask import request
 from werkzeug.utils import secure_filename
 from multiprocessing.pool import ThreadPool
+from multiprocessing import Process
 import os
 
 from factory.servicefactory import project_service
@@ -104,21 +105,30 @@ class UploadFiles(Resource):
 
 			# 调用解压文件的方法
 			extracted_file_path_name = project_service.extracted_upload_files(BASE_DIR_PATH, concat_file_name)
-			# print(extracted_file_path_name, " and ", type(extracted_file_path_name))
+			print("=========extracted file path name: ", extracted_file_path_name)
 
 			# 解压失败
 			if extracted_file_path_name == "":
 				return {"result": "failed",
 				        "message": "file extracted failed"}, 200
+
 			# 解压成功，将项目同解压后的文件关联
 			else:
-				project_service.associated_upload_files_with_project(project_id, extracted_file_path_name)
+				is_validated = project_service.validate_uploaded_files(extracted_file_path_name)
 
-				# start the analyze process
-				pool = ThreadPool(processes = 1)
-				pool.apply_async(RulesAnalyzer().start_evolutionary_analysis(extracted_file_path_name))
+				if not is_validated:
+					project_service.rollback_project(extracted_file_path_name, project_id)
+					return {"result": "failed",
+					        "message": "Zip file was not organized as requirements"}, 200
 
-				return {"result": "success"}, 200
+				else:
+					project_service.associated_upload_files_with_project(project_id, extracted_file_path_name)
+
+					# start the analyze process
+					pool = ThreadPool(processes = 2)
+					pool.apply_async(RulesAnalyzer().start_evolutionary_analysis(extracted_file_path_name))
+
+					return {"result": "success"}, 200
 
 		return {"result": "failed",
 		        "message": "file upload failed"}, 200

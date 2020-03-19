@@ -4,8 +4,6 @@ class CommentCounter(object):
 
 	@staticmethod
 	def get_comment_analysis_for_C_file(file_path: str):
-
-
 		with open(file_path, 'r') as f:
 			line_list = f.readlines()
 

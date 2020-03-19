@@ -33,7 +33,6 @@ class ProjectDao(object):
 		finally:
 			session.close()
 
-
 	@staticmethod
 	def insert_new_project_for_user(username: str, payload: dict):
 		checker = ProjectDao.get_exact_project_by_name_and_user(payload["projectName"], username)
@@ -88,6 +87,21 @@ class ProjectDao(object):
 			session.commit()
 		except:
 			print("Update project status error!")
+			traceback.print_exc()
+		finally:
+			session.close()
+
+	@staticmethod
+	def delete_project_by_id(projectId: int):
+		try:
+			session = db.session
+
+			project = session.query(Project).get(projectId)
+			session.delete(project)
+
+			session.commit()
+		except:
+			print("Get exact project error 1")
 			traceback.print_exc()
 		finally:
 			session.close()

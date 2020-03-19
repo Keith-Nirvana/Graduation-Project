@@ -2,6 +2,7 @@
 
 /backend-flask/assets/*
 /backend-flask/model/csv_result/*
+/backend-flask/model/image_result/*
 /backend-flask/*.db
 
 # Byte-compiled / optimized / DLL files
