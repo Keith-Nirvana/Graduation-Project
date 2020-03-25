@@ -63,7 +63,7 @@ class RulesAnalyzer(object):
 		self.remove_metric_dict_item(rule_settings)
 		analysis_file_path = fo.write_analyze_result(self.metric_dict, os.path.split(project_base_path)[1])
 		present_service = PresentService()
-		present_service.draw_plots_for_project(analysis_file_path, project_Id, username)
+		present_service.test_and_draw_plots_for_project(analysis_file_path, project_Id, username)
 
 		project_dao.update_project_status(project_Id, username)
 		print("=================finish the analyze process")

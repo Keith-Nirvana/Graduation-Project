@@ -7,6 +7,9 @@ import 'antd/dist/antd.css';
 import Slider from 'react-slick';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import userInfo from "../../stores/global";
+import {message} from "antd/lib/index";
+import axios from "axios/index";
 
 const CarouselWrapper = styled.div`
   height: 70vh;
@@ -47,15 +50,40 @@ class ViewChartsPage extends React.Component {
     super(props);
 
     this.state = {
-      aaa: {}
+      links: []
     }
-  }
+  };
 
   componentDidMount() {
     let temp = qs.parse(this.props.location.search);
-    this.setState({...temp});
-    // console.log(this.state);
+
+    let _this = this;
+    axios.get('/project/view', {
+      params: {
+        username: userInfo.username,
+        projectId: temp.projectId,
+        projectName: temp.projectName
+      }
+    })
+        .then(function (response) {
+          let data = response.data;
+
+          _this.setState({
+            links: data.links
+          });
+
+          console.log(_this.state.links)
+        })
+        .catch(function (error) {
+          message.warning('网络链接出错');
+        });
   }
+
+  componentWillUnmount() {
+    this.setState = (state,callback)=>{
+      return;
+    };
+  };
 
   onChange = (a, b, c) => {
     console.log(a, b, c);
@@ -70,6 +98,14 @@ class ViewChartsPage extends React.Component {
       slidesToScroll: 1
     };
 
+    const carouselItems = this.state.links.map((pic) => (
+        <InnerWrapper key={pic}>
+          <InnerWrapper>
+            <img src={pic.urlLink} style={{height: '480px', width: '640px'}}/>
+          </InnerWrapper>
+        </InnerWrapper>
+    ));
+
     return (
         <WrapperDiv>
           <div>
@@ -81,16 +117,17 @@ class ViewChartsPage extends React.Component {
               <CarouselWrapper>
                 <CarouselBody>
                   <Slider {...settings} style={{width: '720px', height: '520px', margin: 'auto'}}>
-                    <div>
-                      <InnerWrapper>
-                        <img src={[require("../../assets/aveMCC-dogecoin.png")]}/>
-                      </InnerWrapper>
-                    </div>
-                    <div>
-                      <InnerWrapper>
-                        <img src={[require("../../assets/aveMCC-dogecoin.png")]}/>
-                      </InnerWrapper>
-                    </div>
+                    {/*<div>*/}
+                      {/*<InnerWrapper>*/}
+                        {/*<img src={"https://thesis-project.oss-cn-beijing.aliyuncs.com/commentRatebitcoin1.png"} style={{height: '480px', width: '640px'}}/>*/}
+                      {/*</InnerWrapper>*/}
+                    {/*</div>*/}
+                    {/*<div>*/}
+                      {/*<InnerWrapper>*/}
+                        {/*<img src={[require("../../assets/aveMCC-dogecoin.png")]}/>*/}
+                      {/*</InnerWrapper>*/}
+                    {/*</div>*/}
+                    {carouselItems}
                   </Slider>
 
 
@@ -113,7 +150,7 @@ class ViewChartsPage extends React.Component {
               </CarouselWrapper>
             </div>
 
-            <div style={{width: '45%',marginTop:150}}>
+            <div style={{width: '45%', marginTop: 150}}>
               <Title level={4}>图表说明</Title>
               <div style={{marginLeft: 20, lineHeight: '30px'}}>
                 <ol>
@@ -126,9 +163,9 @@ class ViewChartsPage extends React.Component {
 
           </FlyDiv>
         </WrapperDiv>
-  );
+    );
   }
 
-  }
+}
 
-  export default ViewChartsPage;
+export default ViewChartsPage;

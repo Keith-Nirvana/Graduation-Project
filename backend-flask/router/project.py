@@ -109,8 +109,7 @@ class UploadFiles(Resource):
 
 			# 解压失败
 			if extracted_file_path_name == "":
-				return {"result": "failed",
-				        "message": "file extracted failed"}, 200
+				return {"result": "failed", "message": "file extracted failed"}, 200
 
 			# 解压成功，将项目同解压后的文件关联
 			else:
@@ -118,20 +117,21 @@ class UploadFiles(Resource):
 
 				if not is_validated:
 					project_service.rollback_project(extracted_file_path_name, project_id)
-					return {"result": "failed",
-					        "message": "Zip file was not organized as requirements"}, 200
+					return {"result": "failed", "message": "Zip file was not organized as requirements"}, 200
 
 				else:
 					project_service.associated_upload_files_with_project(project_id, extracted_file_path_name)
 
 					# start the analyze process
+					def start_thread(inner_path):
+						ra = RulesAnalyzer()
+						ra.start_evolutionary_analysis(inner_path)
 					pool = ThreadPool(processes = 2)
-					pool.apply_async(RulesAnalyzer().start_evolutionary_analysis(extracted_file_path_name))
+					pool.apply_async(start_thread, (extracted_file_path_name,))
 
 					return {"result": "success"}, 200
 
-		return {"result": "failed",
-		        "message": "file upload failed"}, 200
+		return {"result": "failed", "message": "file upload failed"}, 200
 
 
 @ns.route("/download")
@@ -163,6 +163,6 @@ class ViewAnalysisPicture(Resource):
 
 		new_res = []
 		for item in res:
-			new_res.append("../../../../backend-flask/" + item[1:])
+			new_res.append(item.serialize())
 
 		return {"links": new_res}, 200

@@ -20,20 +20,6 @@ class ObjectStorageService(object):
 
 
 if __name__ == '__main__':
-	# u_name = ""
-	# f_path = ""
-	# print(ObjectStorageService().upload_oss_pics(u_name, f_path))
-
-	def greater(num):
-		return num > 0
-
-	def lower(num):
-		return num < 0
-
-	rule_list = [greater, lower, greater, lower, greater, lower, greater]
-
-	input_num = [1, -1, 2, -2, -3, 0, 0]
-
-	for i in range(len(input_num)):
-		print(rule_list[i](input_num[i]))
-
+	u_name = ""
+	f_path = ""
+	print(ObjectStorageService().upload_oss_pics(u_name, f_path))
