@@ -31,11 +31,6 @@ def write_analyze_result(analyze_result, folder_name):
 		return target_file_path
 
 
-def write_hypothesis_testing_result(testing_result, root_path, project_id):
-	# todo
-	pass
-
-
 EXT_LIMITATION = [".py", ".cpp", ".c", ".h"]
 
 def get_file_md5(file_path):
