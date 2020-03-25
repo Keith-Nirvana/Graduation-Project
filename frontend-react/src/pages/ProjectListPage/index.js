@@ -20,55 +20,55 @@ const ListWrapper = styled.div`
 `;
 
 
-const mockInfo = [
-  {
-    projectName: "比特币1",
-    projectDescription: "asdfbaskdjnfoiphnodsanfa",
-    projectID: "2333",
-    isFinished: true
-  },
-  {
-    projectName: "比特币2",
-    projectDescription: "asdfbaskdjnfoiphnodsanfa",
-    isFinished: true
-  },
-  {
-    projectName: "比特币3",
-    projectDescription: "asdfbaskdjnfoiphnodsanfa",
-    isFinished: true
-  },
-  {
-    projectName: "比特币4",
-    projectDescription: "asdfbaskdjnfoiphnodsanfa",
-    isFinished: false
-  },
-  {
-    projectName: "比特币5",
-    projectDescription: "asdfbaskdjnfoiphnodsanfa",
-    isFinished: true
-  },
-  {
-    projectName: "比特币1",
-    projectDescription: "asdfbaskdjnfoiphnodsanfa",
-    isFinished: true
-  },
-  {
-    projectName: "比特币2",
-    projectDescription: "asdfbaskdjnfoiphnodsanfa",
-    isFinished: false
-  },
-  {
-    projectName: "比特币3",
-    projectDescription: "asdfbaskdjnfoiphnodsanfa",
-    isFinished: false
-  },
-  {
-    projectName: "比特币4",
-    projectDescription: "asdfbaskdjnfoiphnodsanfa",
-    isFinished: true
-  },
-
-];
+// const mockInfo = [
+//   {
+//     projectName: "比特币1",
+//     projectDescription: "asdfbaskdjnfoiphnodsanfa",
+//     projectID: "2333",
+//     isFinished: true
+//   },
+//   {
+//     projectName: "比特币2",
+//     projectDescription: "asdfbaskdjnfoiphnodsanfa",
+//     isFinished: true
+//   },
+//   {
+//     projectName: "比特币3",
+//     projectDescription: "asdfbaskdjnfoiphnodsanfa",
+//     isFinished: true
+//   },
+//   {
+//     projectName: "比特币4",
+//     projectDescription: "asdfbaskdjnfoiphnodsanfa",
+//     isFinished: false
+//   },
+//   {
+//     projectName: "比特币5",
+//     projectDescription: "asdfbaskdjnfoiphnodsanfa",
+//     isFinished: true
+//   },
+//   {
+//     projectName: "比特币1",
+//     projectDescription: "asdfbaskdjnfoiphnodsanfa",
+//     isFinished: true
+//   },
+//   {
+//     projectName: "比特币2",
+//     projectDescription: "asdfbaskdjnfoiphnodsanfa",
+//     isFinished: false
+//   },
+//   {
+//     projectName: "比特币3",
+//     projectDescription: "asdfbaskdjnfoiphnodsanfa",
+//     isFinished: false
+//   },
+//   {
+//     projectName: "比特币4",
+//     projectDescription: "asdfbaskdjnfoiphnodsanfa",
+//     isFinished: true
+//   },
+//
+// ];
 
 class ProjectListPage extends React.Component {
   constructor(props){
