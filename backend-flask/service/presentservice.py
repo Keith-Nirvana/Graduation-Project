@@ -115,6 +115,12 @@ class PresentService(object):
 			modified_data.append(df["fileModified"][i])
 			deleted_data.append(df["fileDeleted"][i])
 
+		if np.isnan(added_data[-1]):
+			added_data = added_data[: -1]
+			modified_data = modified_data[: -1]
+			deleted_data = deleted_data[: -1]
+			order_no = order_no[: -1]
+
 		return order_no, added_data, modified_data, deleted_data
 
 	def draw_file_changes_plot(self, order_no, added_data, modified_data, deleted_data):

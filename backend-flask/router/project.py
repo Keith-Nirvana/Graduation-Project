@@ -1,8 +1,7 @@
 from flask_restplus import Resource, fields, Namespace
-from flask import request
+from flask import request, send_from_directory
 from werkzeug.utils import secure_filename
 from multiprocessing.pool import ThreadPool
-from multiprocessing import Process
 import os
 
 from factory.servicefactory import project_service
@@ -134,13 +133,24 @@ class UploadFiles(Resource):
 		return {"result": "failed", "message": "file upload failed"}, 200
 
 
+download_arg_parser = ns.parser()
+download_arg_parser.add_argument('username', type = str, help = '用户名', location = 'args')
+download_arg_parser.add_argument('projectId', type = int, help = '项目编号', location = 'args')
+
 @ns.route("/download")
 class DownloadAnalysisFiles(Resource):
 
 	@ns.doc("下载分析文件")
-
+	@ns.expect(download_arg_parser)
 	def get(self):
-		pass
+		args = download_arg_parser.parse_args()
+		username = args['username']
+		project_id = args['projectId']
+
+		res = project_service.get_path_for_analysis_download(project_id)
+		path_split = os.path.split(res)
+		print(path_split[0], print(path_split[1]))
+		return send_from_directory(path_split[0], filename=path_split[1], as_attachment=True)
 
 
 pic_arg_parser = ns.parser()

@@ -117,35 +117,10 @@ class ViewChartsPage extends React.Component {
               <CarouselWrapper>
                 <CarouselBody>
                   <Slider {...settings} style={{width: '720px', height: '520px', margin: 'auto'}}>
-                    {/*<div>*/}
-                      {/*<InnerWrapper>*/}
-                        {/*<img src={"https://thesis-project.oss-cn-beijing.aliyuncs.com/commentRatebitcoin1.png"} style={{height: '480px', width: '640px'}}/>*/}
-                      {/*</InnerWrapper>*/}
-                    {/*</div>*/}
-                    {/*<div>*/}
-                      {/*<InnerWrapper>*/}
-                        {/*<img src={[require("../../assets/aveMCC-dogecoin.png")]}/>*/}
-                      {/*</InnerWrapper>*/}
-                    {/*</div>*/}
+
                     {carouselItems}
                   </Slider>
 
-
-                  {/*<Carousel style={{width: '720px', height: '520px', margin: 'auto'}}*/}
-                  {/*dots="true" afterChange={this.onChange}>*/}
-
-                  {/*<div>*/}
-                  {/*<InnerWrapper>*/}
-                  {/*<img src={[require("../../assets/aveMCC-dogecoin.png")]}/>*/}
-                  {/*</InnerWrapper>*/}
-                  {/*</div>*/}
-
-                  {/*<div>*/}
-                  {/*<InnerWrapper>*/}
-                  {/*<img src={[require("../../assets/aveMCC-dogecoin.png")]}/>*/}
-                  {/*</InnerWrapper>*/}
-                  {/*</div>*/}
-                  {/*</Carousel>*/}
                 </CarouselBody>
               </CarouselWrapper>
             </div>

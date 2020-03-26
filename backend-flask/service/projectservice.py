@@ -73,4 +73,10 @@ class ProjectService(object):
 		result = self.analysis_item_dao.get_result_for_single_project(project_id)
 		return result
 
+	def get_path_for_analysis_download(self, project_id):
+		location = self.project_dao.get_exact_project_by_id(project_id).projectLoc
+		asset_name = os.path.split(location)[1]
+
+		return "./model/csv_result/" + asset_name + "-analysis.csv"
+
 
